@@ -1,0 +1,141 @@
+@article{kumar2010cloud,
+  title={Cloud computing for mobile users: Can offloading computation save energy?},
+  author={Kumar, Karthik and Lu, Yung-Hsiang},
+  journal={Computer},
+  volume={43},
+  number={4},
+  pages={51--56},
+  year={2010},
+  publisher={IEEE}
+}
+@article{dinh2013survey,
+  title={A survey of mobile cloud computing: architecture, applications, and approaches},
+  author={Dinh, Hoang T and Lee, Chonho and Niyato, Dusit and Wang, Ping},
+  journal={Wireless communications and mobile computing},
+  volume={13},
+  number={18},
+  pages={1587--1611},
+  year={2013},
+  publisher={Wiley Online Library}
+}
+@article{fernando2013mobile,
+  title={Mobile cloud computing: A survey},
+  author={Fernando, Niroshinie and Loke, Seng W and Rahayu, Wenny},
+  journal={Future generation computer systems},
+  volume={29},
+  number={1},
+  pages={84--106},
+  year={2013},
+  publisher={Elsevier}
+}
+@inproceedings{ning2015mobile,
+  title={Mobile storm: Distributed real-time stream processing for mobile clouds},
+  author={Ning, Qian and Chen, Chien-An and Stoleru, Radu and Chen, Congcong},
+  booktitle={Cloud Networking (CloudNet), 2015 IEEE 4th International Conference on},
+  pages={139--145},
+  year={2015},
+  organization={IEEE}
+}
+@inproceedings{fishman2013hvx,
+  title={HVX: Virtualizing the Cloud.},
+  author={Fishman, Alex and Rapoport, Mike and Budilovsky, Evgeny and Eidus, Izik and others},
+  booktitle={HotCloud},
+  year={2013}
+}
+@article{chowdhury2009network,
+  title={Network virtualization: state of the art and research challenges},
+  author={Chowdhury, NM Mosharaf Kabir and Boutaba, Raouf},
+  journal={IEEE Communications magazine},
+  volume={47},
+  number={7},
+  year={2009},
+  publisher={IEEE}
+}
+@article{cen2003end,
+  title={End-to-end differentiation of congestion and wireless losses},
+  author={Cen, Song and Cosman, Pamela C and Voelker, Geoffrey M},
+  journal={IEEE/ACM Transactions on networking},
+  volume={11},
+  number={5},
+  pages={703--717},
+  year={2003},
+  publisher={IEEE}
+}
+@misc{genymotion,
+  author = {Mark Wilson},
+  title = {{Genymotion On Demand is a cloud-based virtualized Android emulator for the enterprise}},
+  howpublished = "\url{https://betanews.com/2017/02/27/genymotion-on-demand-android/}",
+  year = {2017},
+  note = "[Online; accessed 20-March-2017]"
+}
+@misc{bworld,
+  author = {Oracle},
+  title = {{HVX: High performance nested virtualization}},
+  howpublished = "\url{https://www.ravellosystems.com/technology/nested-virtualization}",
+  year = {2015},
+  note = "[Online; accessed 20-March-2017]"
+}
+@book{hwang1998scalable,
+  title={Scalable parallel computing: technology, architecture, programming},
+  author={Hwang, Kai and Xu, Zhiwei},
+  year={1998},
+  publisher={Boston: WCB/McGraw-Hill}
+}
+@inproceedings{barham2003xen,
+  title={Xen and the art of virtualization},
+  author={Barham, Paul and Dragovic, Boris and Fraser, Keir and Hand, Steven and Harris, Tim and Ho, Alex and Neugebauer, Rolf and Pratt, Ian and Warfield, Andrew},
+  booktitle={ACM SIGOPS operating systems review},
+  volume={37},
+  number={5},
+  pages={164--177},
+  year={2003},
+  organization={ACM}
+}
+@misc{kjos2009partially,
+  title={Partially virtualizing an I/O device for use by virtual machines},
+  author={Kjos, Todd J and Ross, Jonathan K and De Dinechin, Christophe},
+  year={2009},
+  month=nov # "~3",
+  publisher={Google Patents},
+  note={US Patent 7,613,847}
+}
+@inproceedings{zheng2003empower,
+  title={Empower: A network emulator for wireline and wireless networks},
+  author={Zheng, Pei and Ni, Lionel M},
+  booktitle={INFOCOM 2003. Twenty-Second Annual Joint Conference of the IEEE Computer and Communications. IEEE Societies},
+  volume={3},
+  pages={1933--1942},
+  year={2003},
+  organization={IEEE}
+}
+@inproceedings{judd2005using,
+  title={Using emulation to understand and improve wireless networks and applications},
+  author={Judd, Glenn and Steenkiste, Peter},
+  booktitle={Proceedings of the 2nd conference on Symposium on Networked Systems Design \& Implementation-Volume 2},
+  pages={203--216},
+  year={2005},
+  organization={USENIX Association}
+}
+%following article talks about visualization overheads
+@inproceedings{juve2009scientific,
+  title={Scientific workflow applications on Amazon EC2},
+  author={Juve, Gideon and Deelman, Ewa and Vahi, Karan and Mehta, Gaurang and Berriman, Bruce and Berman, Benjamin P and Maechling, Phil},
+  booktitle={E-Science Workshops, 2009 5th IEEE International Conference on},
+  pages={59--66},
+  year={2009},
+  organization={IEEE}
+}
+@inproceedings{menon2006optimizing,
+  title={Optimizing network virtualization in Xen},
+  author={Menon, Aravind and Cox, Alan L and Zwaenepoel, Willy},
+  booktitle={USENIX annual technical conference},
+  number={LABOS-CONF-2006-003},
+  year={2006}
+}
+@inproceedings{cherkasova2005measuring,
+  title={Measuring CPU Overhead for I/O Processing in the Xen Virtual Machine Monitor.},
+  author={Cherkasova, Ludmila and Gardner, Rob},
+  booktitle={USENIX Annual Technical Conference, General Track},
+  volume={50},
+  year={2005}
+}
