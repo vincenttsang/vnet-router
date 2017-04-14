@@ -397,7 +397,7 @@
 % Do not put math or special symbols in the title.
 
 \title{CSCE 664 Wireless and Mobile Systems\\
-Project Proposal}
+Project Paper Report}
 %
 %
 % author names and IEEE memberships
@@ -469,7 +469,7 @@ Email: \{yzeng, jiangbingqianj\}@tamu.edu}}
 % As a general rule, do not put math, special symbols or citations
 % in the abstract or keywords.
 \begin{abstract}
-We consider the problem of scaling mobile cloud benchmark on pay-as-you-go cloud computing platforms like AWS and Google Cloud. The intuition behind such an idea is that a large amount of physical mobile devices are hard to manage and impractical in terms of infrastructure cost. In this paper, we propose to virtualize mobile devices directly on top of Xen, a common virtualization system used in typical public cloud like AWS, this would eradicate the overhead of nested virtualization used in other virtualization solutions like Ravello Systems. As we virtualized mobile cloud in this way, the network connection (virtual I/O in this case) between different virtual devices is totally different from real world scenario where mobile devices are connected through wireless networks, typically WLAN. To obtain a more realistic virtualized environment, we further introduce a virtual router that sits on top of the virtual I/O and is responsible for forwarding, dropping, retransmitting data packets so that we can emulate the wireless network behavior on virtual I/O.
+We consider the problem of scaling mobile cloud benchmark on pay-as-you-go cloud computing platforms like AWS and Google Cloud. The intuition behind such an idea is that in scalability test of mobile cloud platforms, a large cluster of physical mobile devices are hard to manage and impractical in terms of infrastructure cost. In this paper, we propose to virtualize mobile clouds by leveraging on-demand public cloud to avoid unnecessary cost. More specifically, we directly virtualize mobile devices on top of Xen in stead of doing nested virtualization on the user-level OS commonly offered by cloud providers. The major advantage of such a direct virtualization approach is that it could eradicate the overhead of nested virtualization used in other virtualization solutions like Ravello Systems. However, one drawback of virtualizing mobile cloud for test purpose is that the network connection (virtual I/O in this case) between different virtual devices is totally different from real world scenario where mobile devices are connected through wireless networks, typically WLAN. To obtain a more realistic virtualized environment, we further introduce a virtual router that sits on top of the virtual I/O and is responsible for forwarding, dropping, retransmitting data packets to emulate the wireless network behavior on virtual I/O. Through preliminary experiments, we have show significant differences between virtualized and actual wireless network and proved the necessity of the virtual router for more realistic mobile cloud virtualization.
 \end{abstract}
 
 % Note that keywords are not normally used for peerreview papers.
@@ -590,10 +590,7 @@ As we have mentioned before, Xen is independent on the underlying hardware and s
 The physical Android machines we adopted in the preliminary experiments are two Huawei Y538 smartphones, with Quad-core Snapdragon 210 processor@1.1GHz, 1GB RAM, running Android 5.1.1 (32 bit). The server (referred as master node in mobile cloud) we used is a Y570 laptop with Core i7 CPU and 8GB RAM, running Windows 10.
 
 \subsubsection{Android x86 on XenServer}
-One important reason that we choose Android over iOS or other mobile OSs is that Android is an open-source OS with the support from Google and a huge community. However, Android is developed for mobile devices at the first place and it has certain requirements on hardware configurations. Though native Android system runs pretty fast on smartphones and tablets with mostly ARM-based CPUs, it's a nightmare to run it on desktop CPUs like Intel and AMD. In order to speed up Android on desktop hardware, the community have ported Android to x86 platform by modifying the linux kernel and HALs (Hardware Abstraction Layer) of native Android, known as Android x86\cite{android-x86}. It is shown in some benchmarks that Android x86 outperforms native Android by over 100x with similar hardware configurations\cite{android_x86_bench}. For the sake of Android VM performance, we instead adopted Android x86 and installed it on several VMs on XenServer for virtulizing mobile cloud.
-
-\subsubsection{Networking}
-Before introducing the network setup in our experiments, we briefly introduce the virtualized network paradigms in existing virtualization systems. The commonly used desktop virtualization solution, VMWare Workstation\cite{vmworkstation} 
+One important reason that we choose Android over iOS or other mobile OSs is that Android is an open-source OS with the support from Google and a huge community. However, Android is developed for mobile devices at the first place and it has certain requirements on hardware configurations. Though native Android system runs pretty fast on smartphones and tablets with mostly ARM-based CPUs, it's a nightmare to run it on desktop CPUs like Intel and AMD. In order to speed up Android on desktop
 
 \begin{figure*}
   \centering
@@ -609,6 +606,11 @@ Before introducing the network setup in our experiments, we briefly introduce th
   \caption{VMWare/VirtualBox Networking Mechanisms at a Glance}
   \label{vmware_net} %% label for entire figure
 \end{figure*}
+
+\noindent hardware, the community have ported Android to x86 platform by modifying the linux kernel and HALs (Hardware Abstraction Layer) of native Android, known as Android x86\cite{android-x86}. It is shown in some benchmarks that Android x86 outperforms native Android by over 100x with similar hardware configurations\cite{android_x86_bench}. For the sake of Android VM performance, we instead adopted Android x86 and installed it on several VMs on XenServer for virtulizing mobile cloud.
+
+\subsubsection{Networking}
+Before introducing the network setup in our experiments, we briefly introduce the virtualized network paradigms in existing virtualization systems. The commonly used desktop virtualization solution, VMWare Workstation\cite{vmworkstation} 
 
 \noindent and VirtualBox\cite{vbox}, adopted similar networking mechanisms and they provide 3 solutions for VM networking:
 
@@ -641,10 +643,6 @@ An illustrative comparison between two network paradigms in Xen is shown in Figu
 \end{figure*}
 
 As our goal in the preliminary experiments is to show the great differences between virtualized network and actual wireless connections between smartphones, we set up two Local Area Networks (LANs) respectively, one as a network connected by a wireless router with a subnet virtualized using XenServer across Android VMs, the other is a simple wireless LAN across master node and physical Android smartphones. 
-\begin{itemize}
-	\item {\bf Virtualized Networking: }we have two xenservers and the master node connected to a wireless router through wired network, 3 virtual Android devices are virtualized on xenservers thus they are connected to each other either by system I/O or by wired network, a figure that illustrates the system and network architecture in this case is shown in Figure \ref{vnet_arch}.
-	\item {\bf Physical Networking: }in experiments of actual wireless networking, we have two Huawei devices connected to the wireless router through WiFi, the master node is again connected to router by wired network as showin in Figure \ref{pnet_arch}.
-\end{itemize}
 
 \begin{figure}[htbp]
 \begin{center}
@@ -652,6 +650,11 @@ As our goal in the preliminary experiments is to show the great differences betw
 \end{center}	   
 \caption{Experimental Setup for Virtualized Mobile Cloud}\label{vnet_arch}
 \end{figure}
+
+\begin{itemize}
+	\item {\bf Virtualized Networking: }we have two xenservers and the master node connected to a wireless router through wired network, 3 virtual Android devices are virtualized on xenservers thus they are connected to each other either by system I/O or by wired network, a figure that illustrates the system and network architecture in this case is shown in Figure \ref{vnet_arch}.
+	\item {\bf Physical Networking: }in experiments of actual wireless networking, we have two Huawei devices connected to the wireless router through WiFi, the master node is again connected to router by wired network as showin in Figure \ref{pnet_arch}.
+\end{itemize}
 
 \begin{figure}[htbp]
 \begin{center}
@@ -676,9 +679,9 @@ In mobile cloud as shown in \ref{virtualized_network}, we have a master node who
 \begin{itemize}
 	\item {\bf Master-to-Slave: }a Master-to-Slave transmission happens when the master node transmits scheduling decisions and task input data to slaves through the wireless link. In such transmissions, though the reliability can be guaranteed by using TCP, the instability of wireless link might lead to high latencies in delivering scheduling decisions, low bandwidth would also result in higher response time as the input data cannot be transmitted timely.
 	\item {\bf Slave-to-Master: }typical Slave-to-Master transmission includes the regular heartbeat from slave to master node (which is sometimes referred to as status report), in some cases, the execution results might also be returned to master node through the wireless link. Late arrivals of heartbeat might lead to wrong scheduling decisions while delay of returning data lengthens the average response time.
-	\item {\bf Slave-to-Slave: }
+	\item {\bf Slave-to-Slave: }one thing in common among various distributed and cloud computin g platforms is the interaction between different slaves. The intercommunication between those slaves in the cluster can be transmissions for intermediate results, job/task migrations per scheduling requests, etc. 
 \end{itemize}
-Apparently from the discussions above, the performance of mobile cloud will be greatly influenced by the network. However, in the virtualized mobile cloud, either the highly reliable wired network or virtual I/O between VMs on the same server can correctly reflect the properties of a realistic wireless network. In the next section, we empirically prove our argument and show different characteristics between virtualized and actual wireless network in both 3 types of transmissions mentioned above.
+Apparently from the discussions above, the performance of mobile cloud will be greatly influenced by the network. However, in the virtualized mobile cloud, either the highly reliable wired network or virtual I/O between VMs on the same server can correctly reflect the properties of a realistic wireless network. In the next section, we empirically prove this argument and show different characteristics between virtualized and actual wireless network in both 3 types of transmissions mentioned above.
 
 \begin{figure*}
   \centering
@@ -697,23 +700,70 @@ Apparently from the discussions above, the performance of mobile cloud will be g
 
 \section{Preliminary Observations}
 \subsection{Experiment Methodologies}
-Recall that the purpose of our experiment is to find out the differences between virtualized and actual wireless network in terms of common network metrics. As discussed in the last section, there are 3 different types of network traffics and we definitely want to characterize them under both virtualized environment and actual environment. We propose to use bandwidth, packet loss and jitter as metrics for describing the network for the following reasons:
+Recall that the purpose of our experiment is to find out the differences between virtualized and actual wireless network in terms of common network metrics. As discussed in the last section, there are 3 different types of network traffics and we definitely want to characterize them under both virtualized environment and actual environment. We propose to use bandwidth, packet loss and jitter as metrics for describing the network since they might significantly influence the performance of mobile cloud as follows:
 \begin{itemize}
 	\item {\bf Bandwidth: }the bandwidth of a certain transmission category is important in the sense that it could precisely reflect the long-term performance and capacity of a network, which directly determines the capacity of mobile cloud platform. For example, in distributed stream processing cluster, the system throughput is upper bounded by the bandwidth of the wireless network.
 	\item {\bf Packet Loss: }in mobile clouds that adopt unreliable transmission protocols, packet losses of the network directly lead to unreliability of the platform while in other mobile clouds packet losses are the major contributor of network jitters.
 	\item {\bf Jitter: }jitters in the network might result in delays of scheduling decisions from the master node, underutilization of downstream computing resources as well as wrong scheduling decisions as mentioned before.
 \end{itemize}
-A common strategy to probe the network capacity and other characteristics is to gradually stress the network and collect metrics data for analysis. Following the physical and virtual environment settings proposed in section IV, for each transmission category we set the receiver as the iPerf server and the sender as the iPerf client and then stress the network by sending data at a transmitting rate ranging from 5 Mbps to 60 Mbps (5 Mbps as interval) in 10 seconds and record the corresponding metrics we get. We repeat the experiments for 3 times in different time of a day and plot out the tendency diagram with error bar to mitigate the variance influences and observe fluctuations of network status under different networking scenarios.
-
+A common strategy to probe the network capacity and other characteristics is to gradually stress the network and collect metrics data for analysis. Following the physical and virtual environment settings proposed in section IV, for each transmission category we set the receiver as the iPerf server and the sender as the iPerf client and then stress the network by sending data at a transmitting rate ranging from 5 Mbps to 60 Mbps (5 Mbps as interval) in 10 seconds and record the corresponding metrics we obtain. We conduct experiments in both virtualized and wireless environments and repeat the experiments for 3 times in different time of a day. The final result we acquire is a tendency diagram (increasing transmitting rate) with error bars to mitigate the variance influences and observe fluctuations of network status under different networking scenarios.
 
 \subsection{Slave-to-Slave Network Characteristics}
+The metrics we measured under different traffic load for Slave-to-Slave transmissions are shown in Figure \ref{c_c}. Be noticed that this test differs from all other experiments in that we have three groups of data for comparison. The underlying reason is that for Slave-to-Slave transmission in virtualized environment, we also have two scenarios:
+\begin{itemize}
+	\item Data transmissions happening between VMs across different XenServer.
+	\item Data transmissions happening between VMs on the same XenServer.
+\end{itemize}
+From the bandwidth tendency shown in Figure \ref{c_c_bw}, we can see that at the very beginning, the bandwidth of all three scenarios increases with the transmitting rate. However, immediately as the transmitting rate exceeds 5 Mbps the actual wireless network seems to be overloaded and the following bandwidth (no matter how much the transmitting rate increases) stay around 8 Mbps. For both other two kinds of network, their maximum bandwidth is much higher than the actual scenarios. Internal VM network and across-server VM network respectively yields maximum bandwidth around 45 Mbps and 52 Mbps. Furthermore, by analyzing jitters and packet losses, we can also get a basic understanding of the high unstability in wireless network comparing to its counterparts. For short, the wireless link in the actual scenario yields much lower bandwidth, produces a lot more jitters and packet losses, and is highly unstable.
 
+\begin{figure*}
+  \centering
+  \subfigure[Master-to-Slave Bandwidth]{
+    \label{s_c_bw} %% label for first subfigure
+    \includegraphics[width=0.32\linewidth]{s_c_bw.jpg}}
+  \subfigure[Master-to-Slave Packet Loss]{
+    \label{s_c_pl} %% label for second subfigure
+    \includegraphics[width=0.32\linewidth]{s_c_pl.jpg}}
+ \subfigure[Master-to-Slave Jitter]{
+    \label{s_c_jitter} %% label for first subfigure
+    \includegraphics[width=0.32\linewidth]{s_c_jitter.jpg}}
+  \caption{Network Characteristics Comparison for Master-to-Slave Communication}
+  \label{s_c} %% label for entire figure
+\end{figure*}
+
+\begin{figure*}
+  \centering
+  \subfigure[Slave-to-Master Bandwidth]{
+    \label{c_s_bw} %% label for first subfigure
+    \includegraphics[width=0.32\linewidth]{c_s_bw.jpg}}
+  \subfigure[Slave-to-Master Packet Loss]{
+    \label{c_s_pl} %% label for second subfigure
+    \includegraphics[width=0.32\linewidth]{c_s_pl.jpg}}
+ \subfigure[Slave-to-Master Jitter]{
+    \label{c_s_jitter} %% label for first subfigure
+    \includegraphics[width=0.32\linewidth]{c_s_jitter.jpg}}
+  \caption{Network Characteristics Comparison for Slave-to-Master Communication}
+  \label{c_s} %% label for entire figure
+\end{figure*}
 
 \subsection{Master-to-Slave Network Characteristics}
+The metrics we measured under different traffic load for Master-to-Slave transmissions are shown in Figure \ref{s_c}. Apparently the figure shows a much better bandwidth for actual Master-to-Slave network, around 25 Mbps, this makes sense due to the fact that only one device is occupying the wireless channel in this scenario which means much less interferences, collisions and backoffs. However, we also noticed the increasingly high packet loss rate and jitters in this experiment are due to overloading of wireless link, while currently we cannot find a proper explanation for why both packet losses and jitters in this scenario exceed the Slave-to-Slave case. Again, the wireless link is highly unstable if we look at the error bars.
 
 \subsection{Slave-to-Master Network Characteristics}
+The metrics we measured under different traffic load for Slave-to-Master transmissions are shown in Figure \ref{c_s}. Through the measurement figures, we can see that the results look similar to the Slave-to-Slave case. The only one thing worth mention here is that the Slave-to-Master bandwidth lies in between the max bandwidth of Master-to-Slave and Slave-to-Slave. On the one hand, we don't have much interferences in this case, therefore we can transmit data faster than Slave-to-Slave. On the other hand, it's common for an actual wireless router to have lower uplink bandwidth than downlink, thus the network performance here is inferior to the Master-to-Server case.
 
+\section{Conclusion}
+So far in this paper, we have established two mobile cloud systems, one based on efficient direct virtualization while the other is an actual mobile cloud connected through wireless link. A detailed review and analysis of networking in virtualized environment are also provided.  For network benchmarking, iPerf 2 is poted to Android platform and several tricks are applied before it executes successfully. The major contribution of our paper by now is an empirical analysis of network differences between virtualized and actual wireless scenario. Through a series of experiments, we have shown that virtualized environment is nonrealistic for testing mobile clouds since it enjoys much higher bandwidth and is really stable in terms of jitter and packet losses, comparing to a common wireless link.
 
+\section{Future Work}
+\subsection{Bridging Wireless to Ethernet}
+As we have already covered in the literature review of network benchmarking tools on Android, most of those APPs are based purely on WiFi connection due to the dominance of it on mobile devices. This exposes a major problem in our virtualization approach for scaling mobile cloud tests. Most APPs available on Android platforms are like those tools and Ethernet connection adopted in our virtualization approach is not commonly supported. Therefore, we propose to bridge the wireless network interface (wlan0) of virtualized Android system to the Ethernet interface (eth0) so that the wireless traffic can be automatically forwarded to Ethernet. In this way, we will be able to run almost all applications or mobile cloud platforms without any changes and the compatibility of our method will be greatly improved.
+
+\subsection{More Reliable Experiments}
+For compatibility considerations, the preliminary experiments are conducted based on iPerf 2.0.5, an obsolete version that is no longer maintained by developers. We discovered several problems in this version of iPerf like we cannot set transmitting rate in MBytes and the TCP-related utilities are limited. We expect to port newer iPerf 3 into experiments which incorporates more functionalities and could be used to capture more features of  the network. Also, currently we are testing the network in an environment with many interferences, we expect a great probability that the uncommonly high packet losses and jitters in Figure \ref{s_c} are caused by those interferences. Additionally, though repeated experiments are carried out, we are still looking for new methodologies that involves a lot more tests for recognizing the wireless network performance pattern.
+
+\subsection{Characterizing and Emulating Wireless Network}
+We expect a large amount of long-term and short-term experiments in the future so that we might be able to capture the bandwidth/jitters/packet losses distribution of wireless link and find a way to emulate it in virtualized environment.
 % Can use something like this to put references on a page
 % by themselves when using endfloat and the captionsoff option.
 \ifCLASSOPTIONcaptionsoff
