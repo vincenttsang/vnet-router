@@ -174,6 +174,7 @@
 % default pic path
 \usepackage{bm}
 \usepackage{mathtools}
+\usepackage{subfigure}
 %\let\oldvec\vec
 %\renewcommand{\vec}[1]{\oldvec{\mathit{#1}}}
 %\newcommand{\mat}[1]{\mathbf{#1}} % undergraduate algebra version
@@ -543,21 +544,24 @@ Genymotion \cite{genymotion} is a new cloud-based virtualization platform aimed 
 \subsection{Xen}
 Xen \cite{barham2003xen} is an x86 virtual machine monitor which allows multiple commodity operating systems to share conventional hardware in a safe and resource managed fashion, but without sacrificing either performance or functionality. This is achieved by providing an idealized virtual machine abstraction to which operating systems such as Linux, BSD and Windows XP, can be ported with minimal effort. The virtualization approach taken by Xen is extremely efficient: it allows operating systems such as Linux and Windows XP to be hosted simultaneously only with a negligible performance overhead --- at most a few percent compared with the unvirtualized case. 
 
-%The advantages of virtualization with Xen comparing to other solutions are as follows:
-%\begin{itemize}
-%	\item Independence on hardware and the support for different operating systems (both commercial and open source OSs).
-%	\item Neither performance nor security and functionalities are sacrificed in Xen to accomodate the requirements of each other.
-%	\item Xen offers resource isolation and performance guarantees for VMs running on it without risk of DoS.
-%\end{itemize}
+The advantages of virtualization with Xen comparing to other solutions are as follows:
+\begin{itemize}
+	\item Independence on hardware and the support for different operating systems (both commercial and open source OSs).
+	\item Neither performance nor security and functionalities are sacrificed in Xen to accomodate each other.
+	\item Xen offers resource isolation and performance guarantees for VMs running on it without risk of DoS.
+	\item It is now open sourced as Xen Project \cite{xenproj} in collaboration with Linux Foundation and enjoys technical support from a huge community.
+\end{itemize}
 
-Compared with Xen, many other virtualization systems expose a lot of disadvantages. Some require specialized hardware, or cannot support commodity operating systems. Some target $100\%$ binary compatibility at the expense of performance. Others sacrifice security or functionality for speed. Few offer resource isolation or performance guarantees; most provide only best-effort provisioning, risking denial of service. Xen overcomes all above cons, and thus gains popularity with modern public cloud service like AWS. In this paper, we built our virtualized mobile cluster on XenServer, a commercial implementation of Xen. Our research will conducted based on Xen as well. With functions Xen provide, we will further extend and optimize the performance to achieve a faster virtualization environment for real-world wireless cloud service simulation.
+Due to those advantages, Xen soon gains popularity with modern public cloud services like AWS. In this paper, we adopt XenServer\cite{xenserver}, an open-source virtualization platform that has been accepted by current industry based on Xen Project hypervisor, as our environment for virtualizing Android devices to build a scalable mobile cloud. We will briefly discuss other available mobile cloud virtualization approaches as well as the XenServer setup we used in our paper in the following sections. 
+
+%Compared with Xen, many other virtualization systems expose a lot of disadvantages. Some require specialized hardware, or cannot support commodity operating systems. Some target $100\%$ binary compatibility at the expense of performance. Others sacrifice security or functionality for speed. Few offer resource isolation or performance guarantees; most provide only best-effort provisioning, risking denial of service. Xen overcomes all above cons, and thus gains popularity with modern public cloud service like AWS. In this paper, we built our virtualized mobile cluster on XenServer, a commercial implementation of Xen. Our research will conducted based on Xen as well. With functions Xen provide, we will further extend and optimize the performance to achieve a faster virtualization environment for real-world wireless cloud service simulation.
 
 \section{Proposed Solution}
 \subsection{Virtualizing Mobile Devices in Cloud}
-Ravello systems provided solution to run any virtual machine on any cloud without changes to operating systems through nested virtualization, however there will be additional overhead in the 2nd layer of virtualization in terms of processor power, network throughput, etc. Moreover, normal customers of public clouds are serviced directly from the virtualized OS level (i.e., an operating system is immediately installed per request) and they might not have access to nested virtualization as it's a low level setting in Xen which is not commonly exposed by cloud platforms for security considerations. Here in this paper we propose to virtualize Android system directly on top of Xen, which can greatly reduce the overheads. More specifically, we use XenServer as the hypervisor for the physical machine and install Android directly on VMs without any intermediate Linux or Windows system.
+Ravello systems provided solution to run any virtual machine on any cloud without changes to operating systems through nested virtualization, however there will be additional overhead in the 2nd layer of virtualization in terms of processor and memory speed, I/O, network, etc. Moreover, normal customers of public clouds are serviced directly from the virtualized OS level (i.e., an operating system like Windows or Linux is immediately installed per user's request) and they might not have access to nested virtualization as it's a low level setting in Xen which is not commonly exposed by cloud platforms for security considerations. Here in this paper we propose to virtualize Android system directly on top of Xen, which can greatly reduce overheads mentioned above and this is practical as long as Android image is supported in the cloud. More specifically, we use XenServer as the hypervisor for managing resources of the physical machine and install Android directly on VMs without any intermediate Linux or Windows system.
 
 \subsection{Wireless Emulator on Virtual I/O}
-As we have mentioned before, we can test the scalibility of a mobile cloud platform by leveraging virtualization techniques on public clouds, however, such an approach cannot provide a realistic wireless networking environment as the communication between different virtual devices goes through the virtual I/O, which is either the virtualized system I/O or wired network between different host servers. To better emulate the actual wireless networked mobile cloud platform, we propose a wireless network emulator on top of virtual I/O to virtually control the delivery of data packet between different virtual devices to acquire a network transmission pattern similar to real wireless network system. As shown in Fig. \ref{virtual_router}, the virtual wireless network emulator lies on the virtual I/O layer and is responsible for coordinating the network transmission between different virtual devices. At the current stage, we expect the emulator to be an application on Android, it might exposes some ports to receive or output data packets in the virtualized network, it works by dropping packets and retransmission in a wireless manner. 
+As we have mentioned before, we can test the scalibility of a mobile cloud platform easily by leveraging virtualization techniques on public clouds, however, such an approach cannot provide a realistic wireless networking environment as the communication between different virtual devices goes through the virtual I/O, which is either based on system I/O or wired network between different host servers. To better emulate the actual wireless networked mobile cloud platform, we propose a wireless network emulator on top of virtual I/O to virtually control the delivery of data packet between different virtual devices to acquire a network transmission pattern similar to real wireless network system. As shown in Fig. \ref{virtual_router}, the virtual wireless network emulator lies on the virtual I/O layer and is responsible for coordinating the network transmission between different virtual devices. At the current stage, we expect the emulator to be an application on Android, it might exposes some ports to receive and forward data packets in the virtualized network, it works by dropping packets and do retransmission in a wireless manner. 
 \begin{figure}[htbp]
 \begin{center}
 \includegraphics[width=0.8\linewidth]{virtual_router.png} 
@@ -568,10 +572,148 @@ As we have mentioned before, we can test the scalibility of a mobile cloud platf
 \subsection{Expected Chanllenges}
 Our project is highly challenging in that it incorporates problems in both virtualization and networking, basically we need to find proper approach to achieve the following goals:
 \begin{itemize}
-	\item Improving virtual device performance: virtual machines are typically much slower than physical machines with the same hardware and software configuration, even with the hardware speedup provided by newly introduced Intel VT-x or AMD-V CPU, which makes the benchmark harder. To reduce the virtualization overhead, we propose to virtualize mobile devices at the lowest level possible and we adopt Android for x86 to acquire better support for desktop CPUs (oppsed to typical Android device CPU like ARM).
+	\item Improving virtual device performance: virtual machines are typically much slower than physical machines with the same hardware and software configuration, even with the hardware speedup provided by newly introduced Intel VT-x or AMD-V CPU, which makes the benchmark harder. To reduce the virtualization overhead, we propose to virtualize mobile devices at the lowest level possible and we adopt Android for x86 to acquire better support for desktop CPUs like Intel Core series (oppsed to typical Android device CPU like ARM).
 	\item Networking in virtualized environment: as we mentioned above, we need to virtualize mobile device cluster using XenServer, however, to the best of our knowledge so far, native network is not provided directly by the virtualized Android system on XenServer, we might have to deal with device driver and figure out a way to network virtual devices in either the same machine or LAN.
-	\item Wireless network emulation: though a huge volume of researches have been put into wireless network emulation, here we expect many challenges since we are doing emulation on Android platform and the whole system lies in a virtualized environment, the final implementation of wireless emulation should be a totally different story comparing to previous work.
+	\item Wireless network emulation: though a huge volume of researches have been put into wireless network emulation and simulation, here we expect many challenges since we are doing emulation on Android platform and the whole system lies in a virtualized environment, the final implementation of wireless emulation should be a totally different story comparing to previous work.
 \end{itemize}
+
+\section{Experimental Setup}
+To validate our argument that the virtualized networking is totally different from actual wireless environment applied in mobile cloud, we did a series of preliminary experiments to capture the characteristics of virtual network and actual wireless network. In this section we present the setup of our virtualized environment as well as methodologies we adopted in preliminary experiments.
+\subsection{XenServer Virtualization Environment}
+\subsubsection{Hardware Configuration}
+As we have mentioned before, Xen is independent on the underlying hardware and supports various operating systems, however one thing worth mention is that Xen does require a standard 64-bit x86-based system to support paravirtualized linux, a standard 64-bit x86-based system with Intel VT or AMD-V for running Windows. In our case, we failed to virtualize Android system on an  old AMD server (no AMD-V support) but we succeeded in running both Linux and Android on two Intel Core 2 platform (with Intel VT support). Eventually we set up 3 Android VMs across two Intel-based PCs: a Dell OptiPlex 755 PC with Core 2 Duo CPU E8400@3.00GHz and 4GB RAM, running 1 Android instance; a HP DC7900 PC with the same CPU but 8GB RAM, running 2 Android instances. Be noticed that if not otherwise indicated, we use a standard Android instance of the following configurations defaultly:
+\begin{itemize}
+	\item {\bf Virtual Hardware: }2 vCPUs and 2GB RAM, 8GB internal storage and a Virtual Network Interface.
+	\item {\bf System: }Android x86 5.1 Lollipop rc1 (64 bit).
+\end{itemize}
+
+The physical Android machines we adopted in the preliminary experiments are two Huawei Y538 smartphones, with Quad-core Snapdragon 210 processor@1.1GHz, 1GB RAM, running Android 5.1.1 (32 bit). The server (referred as master node in mobile cloud) we used is a Y570 laptop with Core i7 CPU and 8GB RAM, running Windows 10.
+
+\subsubsection{Android x86 on XenServer}
+One important reason that we choose Android over iOS or other mobile OSs is that Android is an open-source OS with the support from Google and a huge community. However, Android is developed for mobile devices at the first place and it has certain requirements on hardware configurations. Though native Android system runs pretty fast on smartphones and tablets with mostly ARM-based CPUs, it's a nightmare to run it on desktop CPUs like Intel and AMD. In order to speed up Android on desktop hardware, the community have ported Android to x86 platform by modifying the linux kernel and HALs (Hardware Abstraction Layer) of native Android, known as Android x86\cite{android-x86}. It is shown in some benchmarks that Android x86 outperforms native Android by over 100x with similar hardware configurations\cite{android_x86_bench}. For the sake of Android VM performance, we instead adopted Android x86 and installed it on several VMs on XenServer for virtulizing mobile cloud.
+
+\subsubsection{Networking}
+Before introducing the network setup in our experiments, we briefly introduce the virtualized network paradigms in existing virtualization systems. The commonly used desktop virtualization solution, VMWare Workstation\cite{vmworkstation} 
+
+\begin{figure*}
+  \centering
+  \subfigure[Bridged Networking in VMWare]{
+    \label{vmware_bridging} %% label for first subfigure
+    \includegraphics[width=0.45\linewidth]{vmware_bridging.png}}
+  \subfigure[NAT Networking in VMWare]{
+    \label{vmware_nat} %% label for second subfigure
+    \includegraphics[width=0.45\linewidth]{vmware_nat.png}}
+ \subfigure[Host-only Networking in VMWare]{
+    \label{vmware_hostonly} %% label for first subfigure
+    \includegraphics[width=0.45\linewidth]{vmware_hostonly.png}}
+  \caption{VMWare/VirtualBox Networking Mechanisms at a Glance}
+  \label{vmware_net} %% label for entire figure
+\end{figure*}
+
+\noindent and VirtualBox\cite{vbox}, adopted similar networking mechanisms and they provide 3 solutions for VM networking:
+
+\begin{itemize}
+	\item {\bf Bridged: }In bridged networking, a VM will be assigned unique identity on the same external network that the host machine lies in. Take VMWare Workstation as an example, this is achieved by bridging the Virtual Ethernet Switch to the physical Ethernet adapter on host as shown in Figure \ref{vmware_bridging}.
+	\item {\bf Network Address Translating (NAT): }VMs configured in NAT mode will form a internal LAN and they share the same network identity with the physical machine. In this case, VM will connect to the virtual Ethernet switch and be assigned an private net IP address by a virtual DHCP server. For access to external network, VM sends packets to the host and the packets will be forwarded after NAT is done. A simple demonstration of the NAT mechanism is shown in Figure \ref{vmware_nat}.
+	\item {\bf Host-only: }Host-only mode provides a private network connection between the VM and the host using a similar virtual Ethernet switch, as shown in \ref{vmware_hostonly}. The only difference between Host-only and NAT is that no NAT will be done on the host in Host-only mode.
+\end{itemize}
+
+In Xen, every VM has a virtual NIC (Network Interface Controller), all of which are connected to the virtual network controlled by the XenServer host, also be noticed that the virtual network utilities provided by XenServer works like a physical Ethernet segment at layer 2 of the OSI, posing the nonrealistic networking between VMs as we discussed. Network solutions similar to Host-only and Bridging are also provided in Xen, however they are referred differencely as internal network and external network, here in our discussion we focus on those network modes provided in XenServer:
+\begin{itemize}
+	\item {\bf Internal Networking: }Internal Networking is sometimes also referred to as Single-Server Private Network, in which VIFs (virtual interface) of different VMs are connected by a virtual Ethernet and VMs do not have access to external network.
+	\item {\bf External Networking: }The only difference between external networking and internal networking is the accessibility to external network (i.e., under internal networking VMs have the same network accessibility as the host does). This is made available by adding a virtual switch between the virtual Ethernet and the PIF (physical interface). 
+\end{itemize} 
+An illustrative comparison between two network paradigms in Xen is shown in Figure \ref{xen_net}.
+
+\begin{figure*}
+  \centering
+  \subfigure[Xen Internal Networking Architecture]{
+    \label{xen_internal_net} %% label for first subfigure
+    \includegraphics[width=0.45\linewidth]{xen_internal_net.png}}
+  \subfigure[Xen External Networking Architecture]{
+    \label{xen_external_net} %% label for second subfigure
+    \includegraphics[width=0.45\linewidth]{xen_external_net.png}}
+ \subfigure[Xen Routing between Internal Network and External Network]{
+    \label{xen_routing} %% label for first subfigure
+    \includegraphics[width=0.45\linewidth]{xen_routing.png}}
+  \caption{Xen Networking Mechanisms at a Glance}
+  \label{xen_net} %% label for entire figure
+\end{figure*}
+
+As our goal in the preliminary experiments is to show the great differences between virtualized network and actual wireless connections between smartphones, we set up two Local Area Networks (LANs) respectively, one as a network connected by a wireless router with a subnet virtualized using XenServer across Android VMs, the other is a simple wireless LAN across master node and physical Android smartphones. 
+\begin{itemize}
+	\item {\bf Virtualized Networking: }we have two xenservers and the master node connected to a wireless router through wired network, 3 virtual Android devices are virtualized on xenservers thus they are connected to each other either by system I/O or by wired network, a figure that illustrates the system and network architecture in this case is shown in Figure \ref{vnet_arch}.
+	\item {\bf Physical Networking: }in experiments of actual wireless networking, we have two Huawei devices connected to the wireless router through WiFi, the master node is again connected to router by wired network as showin in Figure \ref{pnet_arch}.
+\end{itemize}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.8\linewidth]{vnet_arch.png} 
+\end{center}	   
+\caption{Experimental Setup for Virtualized Mobile Cloud}\label{vnet_arch}
+\end{figure}
+
+\begin{figure}[htbp]
+\begin{center}
+\includegraphics[width=0.8\linewidth]{pnet_arch.png} 
+\end{center}	   
+\caption{Experimental Setup for Actual Wireless Mobile Cloud Paradigm}\label{pnet_arch}
+\end{figure}
+
+\subsection{Benchmarking Network on Android}
+To characterize the features of both virtualized network and actual wireless network, we need some proper benchmarks to stress the network and probe important metrics in the data transmission process, in this section we first review the current existing solutions for benchmarking network on Android platform and then propose the methodologies we applied in our experiments.
+\subsubsection{Literature Review}
+Though Android network benchmarking gains few attentions from the academia, there are a huge trunk of network tools in Google Play to characterize mainly the wireless network performance of Android. Aruba Utilities\cite{aruba_utility} includes a number of tools useful for characterizing and troubleshooting wireless LANs, some of which can work under any WLAN network while others are designed specifically for Aruba products. For our concern, Aruba Utilities has a Wi-Fi monitor
+showing the Wi-Fi environment such as current access point, and dynamic signal
+strength. It includes Android versions of iPerf\cite{tirumala2005iperf} (a cross-platform tool for active measurements of the maximum achievable bandwidth on IP networks), Ping, DNS and mDNS, which all offer
+network test functionality. The measurements are written to a plain-text log file and
+various csv report files, which could be saved for later use. JPerf\cite{brethour2003jperf} is a graphical front end for the popular network testing tool iPerf. JPerf provides a quick test for WAN or LAN connection to determine the maximum network throughput. Test results will be automatically graphed and presented in a easy-to-read format. Moreover, it can also be used to detect packet loss, delay, jitter, and other common network problems. Other network tools and speed test APPs include WiFi Speed Test\cite{wifi_test}, which provides real-time monitoring of data transmission speed between specified server and client; he.net\cite{iperf}, developed based on iPerf and provides GUI for network diagnostics, gathering and visualizing network performance/status; etc. However, The above mentioned application are all based on iPerf, except for that they do introduce some new
+features like user-friendly GUI (jPerf), IP Calculator (he.net) and
+link coverage measurements (Aruba Utilities). A common disadvantage of them is that they by default call Android WifiManager API to set up the network connection and perform  their
+tests only under Wi-Fi environment. In our virtualized environment or even in the actual scenario (as Ethernet is also supported in Android), the network for benchmarking doesn't necessarily has to be wireless. Therefore, in the wired network scenarios like virtualized mobile cloud, those APPs can simply crash when trying to setup the connection. To correctly benchmark both the performance of wired and wireless network, we propose to simply port iPerf on Android and execute it at the terminal without any GUI.
+\subsubsection{Categorizing Transmissions in Mobile Cloud}
+In mobile cloud as shown in \ref{virtualized_network}, we have a master node who serves like a manager of the cluster and the mobile devices are usually referred as slave nodes. Consider centralized task scheduling and task allocation, the most widely used cloud management paradigm, in which the master node collects all heartbeats from slaves and allocates tasks to them based on the current load information of slaves, typical network transmissions in this management scheme can be categorized as follows:
+\begin{itemize}
+	\item {\bf Master-to-Slave: }a Master-to-Slave transmission happens when the master node transmits scheduling decisions and task input data to slaves through the wireless link. In such transmissions, though the reliability can be guaranteed by using TCP, the instability of wireless link might lead to high latencies in delivering scheduling decisions, low bandwidth would also result in higher response time as the input data cannot be transmitted timely.
+	\item {\bf Slave-to-Master: }typical Slave-to-Master transmission includes the regular heartbeat from slave to master node (which is sometimes referred to as status report), in some cases, the execution results might also be returned to master node through the wireless link. Late arrivals of heartbeat might lead to wrong scheduling decisions while delay of returning data lengthens the average response time.
+	\item {\bf Slave-to-Slave: }
+\end{itemize}
+Apparently from the discussions above, the performance of mobile cloud will be greatly influenced by the network. However, in the virtualized mobile cloud, either the highly reliable wired network or virtual I/O between VMs on the same server can correctly reflect the properties of a realistic wireless network. In the next section, we empirically prove our argument and show different characteristics between virtualized and actual wireless network in both 3 types of transmissions mentioned above.
+
+\begin{figure*}
+  \centering
+  \subfigure[Slave-to-Slave Bandwidth]{
+    \label{c_c_bw} %% label for first subfigure
+    \includegraphics[width=0.32\linewidth]{c_c_bw.jpg}}
+  \subfigure[Slave-to-Slave Packet Loss]{
+    \label{c_c_pl} %% label for second subfigure
+    \includegraphics[width=0.32\linewidth]{c_c_pl.jpg}}
+ \subfigure[Slave-to-Slave Jitter]{
+    \label{c_c_jitter} %% label for first subfigure
+    \includegraphics[width=0.32\linewidth]{c_c_jitter.jpg}}
+  \caption{Network Characteristics Comparison for Slave-to-Slave Communication}
+  \label{c_c} %% label for entire figure
+\end{figure*}
+
+\section{Preliminary Observations}
+\subsection{Experiment Methodologies}
+Recall that the purpose of our experiment is to find out the differences between virtualized and actual wireless network in terms of common network metrics. As discussed in the last section, there are 3 different types of network traffics and we definitely want to characterize them under both virtualized environment and actual environment. We propose to use bandwidth, packet loss and jitter as metrics for describing the network for the following reasons:
+\begin{itemize}
+	\item {\bf Bandwidth: }the bandwidth of a certain transmission category is important in the sense that it could precisely reflect the long-term performance and capacity of a network, which directly determines the capacity of mobile cloud platform. For example, in distributed stream processing cluster, the system throughput is upper bounded by the bandwidth of the wireless network.
+	\item {\bf Packet Loss: }in mobile clouds that adopt unreliable transmission protocols, packet losses of the network directly lead to unreliability of the platform while in other mobile clouds packet losses are the major contributor of network jitters.
+	\item {\bf Jitter: }jitters in the network might result in delays of scheduling decisions from the master node, underutilization of downstream computing resources as well as wrong scheduling decisions as mentioned before.
+\end{itemize}
+A common strategy to probe the network capacity and other characteristics is to gradually stress the network and collect metrics data for analysis. Following the physical and virtual environment settings proposed in section IV, for each transmission category we set the receiver as the iPerf server and the sender as the iPerf client and then stress the network by sending data at a transmitting rate ranging from 5 Mbps to 60 Mbps (5 Mbps as interval) in 10 seconds and record the corresponding metrics we get. We repeat the experiments for 3 times in different time of a day and plot out the tendency diagram with error bar to mitigate the variance influences and observe fluctuations of network status under different networking scenarios.
+
+
+\subsection{Slave-to-Slave Network Characteristics}
+
+
+\subsection{Master-to-Slave Network Characteristics}
+
+\subsection{Slave-to-Master Network Characteristics}
+
+
 % Can use something like this to put references on a page
 % by themselves when using endfloat and the captionsoff option.
 \ifCLASSOPTIONcaptionsoff
@@ -616,10 +758,6 @@ Our project is highly challenging in that it incorporates problems in both virtu
 % simpler here.)
 %\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{mshell}}]{Michael Shell}
 % or if you just want to reserve a space for a photo:
-
-
-
-
 
 % that's all folks
 \end{document}
