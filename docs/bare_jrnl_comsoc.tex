@@ -752,6 +752,55 @@ The metrics we measured under different traffic load for Master-to-Slave transmi
 \subsection{Slave-to-Master Network Characteristics}
 The metrics we measured under different traffic load for Slave-to-Master transmissions are shown in Figure \ref{c_s}. Through the measurement figures, we can see that the results look similar to the Slave-to-Slave case. The only one thing worth mention here is that the Slave-to-Master bandwidth lies in between the max bandwidth of Master-to-Slave and Slave-to-Slave. On the one hand, we don't have much interferences in this case, therefore we can transmit data faster than Slave-to-Slave. On the other hand, it's common for an actual wireless router to have lower uplink bandwidth than downlink, thus the network performance here is inferior to the Master-to-Server case.
 
+\section{Characterizing and Emulating Wireless Network}
+\subsection{Characterizing Wireless Features}
+
+\subsection{Shaping Virtualized Network}
+
+\section{Experiments}
+\subsection{Distribution}
+3 types of distributions when doing experiments:
+1. m to s
+2. s to m
+3. s to s
+for each of the distribution, we do iperf and ping experiments after setting the distribution
+
+TODO:
+1. how to determine the tc params for getting best-fit packet loss curve
+
+assuming we have a script for automated testing, it repetitively test iperf metrics and ping metrics
+this is the manual of tc:
+http://man7.org/linux/man-pages/man8/tc-netem.8.html
+
+Steps for doing experiments:
+distributions we need:
+1. c2c, redo
+2. c2s
+3. s2c
+find a way to get the distribution drew as a graph, hopefully we can get a normal distribution?
+graph 1
+
+
+1. DO NOT apply distribution now, first reevaluate the original network pattern, be noticed that this includes all the experiments we did in last including both the virtualized env and the real env, also including the two cases for c2c: vm across server and on the same server
+	1.1. use iperf_bat_android.sh for testing both c2c, s2c, c2s traffic, notice that we should change  some of the codes for different devices, check all TODOs in the script to see what should be changed
+	1.2. use ping command to test the delay (rtt) of both virtualized case and actual case, draw the delay distribution graph
+	
+2. apply distribution respectively, every time a distribution is applied test the corresponding scenario
+	1.1. how to apply distribution
+
+\subsection{Bandwidth}
+Use iperf to test the bandwidth, this shall be the simplest for emulation.
+
+\subsection{Delay}
+distribution figure
+Use ping command to test the delay of both virtualized network with emulation. We should get very good results here. 
+
+\subsection{Packet Loss}
+Use iperf. 
+
+\subsection{Jitter}
+Use iperf. 
+
 \section{Conclusion}
 So far in this paper, we have established two mobile cloud systems, one based on efficient direct virtualization while the other is an actual mobile cloud connected through wireless link. A detailed review and analysis of networking in virtualized environment are also provided.  For network benchmarking, iPerf 2 is poted to Android platform and several tricks are applied before it executes successfully. The major contribution of our paper by now is an empirical analysis of network differences between virtualized and actual wireless scenario. Through a series of experiments, we have shown that virtualized environment is nonrealistic for testing mobile clouds since it enjoys much higher bandwidth and is really stable in terms of jitter and packet losses, comparing to a common wireless link.
 

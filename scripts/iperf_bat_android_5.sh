@@ -1,4 +1,5 @@
-#!/bin/bash
+#!/system/bin/sh
+# for android
 # TODO be sure to replace this with !/system/bin/sh when running on android
 echo "Bandwidth Jitter PL/Total PLR" >> log
 allInfo=""
@@ -25,9 +26,13 @@ do
 	# TODO be sure to replace by using the exact path to iperf when running on Android
 	# for example, /data/local/tmp/iperf instead of iperf
         #iperf -u -c 10.0.0.21 -b ${speed}mbit -t 30s | sed -n 11p
-	result="$(iperf -u -c 10.0.0.21 -b ${speed}mbit -t 30s | sed -n 11p)"
+	# TODO for android
+	result="$(/data/local/tmp/iperf -u -c $1 -b ${speed}mbit -t 30s | sed -n 11p)"
+	# TODO for server
+	#result="$(iperf -u -c $1 -b ${speed}mbit -t 30s | sed -n 11p)"
 	# sleep until the last UDP connection timed out
-	sleep 1s
+	# TODO if use server, sleep 2s, else if use android, sleep 2
+	sleep 2
 	echo "Raw Results:"
         echo $result
         # TODO change the index -f[x] to -f[7-13] if using experiment time over 10
@@ -56,4 +61,3 @@ do
 
     i=$(($i + 5))
 done
-##!/system/bin/sh
